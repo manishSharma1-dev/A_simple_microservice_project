@@ -80,7 +80,8 @@ const LoginUser = async(req,res) => {
                // - generate an accesstoken 
                // - return the acces token in the user session
 
-    const { email, password } = await req.json()
+    try {
+        const { email, password } = await req.json()
 
     if(password.length === 0 && email.length === 0){
         return new ApiError(400,"Invalid fields, - Fields must be present")
@@ -135,9 +136,182 @@ const LoginUser = async(req,res) => {
         "User Logged in - Successfully",
         logedinUser
     )
+
+    } catch (error) {
+        return new ApiError(
+            500,
+            "User Logged in -faield",
+            error
+        )
+    }
 }
+
+const updateusername = async(req,res) => {
+    try {
+        const { username } = await req.json()
+    
+        if(username.length === 0 ){
+            return new ApiError(400,"Username field is - required")
+        }
+    
+        const userId = req?.user?._id // getting it from the middleware
+    
+        if(!userId){
+            return new ApiError(400,"User -Logged Out")
+        }
+    
+        const Updated_Username = await User.findByIdAndUpdate(
+            userId,
+            {
+                username : username
+            }
+        ).select(" -password ")
+    
+        if(!Updated_Username){
+            return new ApiError(500,"Username Updation Failed")
+        }
+    
+        return res.status(201).json(
+            new Apiresponse(
+                201,
+                "Username -Updated",
+                Updated_Username
+            )
+        )
+    } catch (error) {
+        return new ApiError(
+            500,
+            "Username -Updation failed",
+            error
+        )
+    }
+}
+
+
+const updateemail = async(req,res) =>{
+
+    try {
+        const { email } = await req.json()
+    
+        if(email.length === 0 ){
+            return new ApiError(400,"Email field is - required")
+        }
+    
+        const userId = req?.user?._id // getting it from the middleware
+    
+        if(!userId){
+            return new ApiError(400,"User -Logged Out")
+        }
+    
+        const Updated_Email = await User.findByIdAndUpdate(
+            userId,
+            {
+                email : email
+            }
+        ).select(" -password ")
+    
+        if(!Updated_Email){
+            return new ApiError(500,"Email Updation Failed")
+        }
+    
+        return res.status(201).json(
+            new Apiresponse(
+                201,
+                "Email -Updated",
+                Updated_Email
+            )
+        )
+    } catch (error) {
+        return new ApiError(
+            500,
+            "Email Updation -failed",
+            error
+        )
+    }
+
+}
+
+const updatepassword = async(req,res) => {
+
+    try {
+        const { oldpassword , newpassword } = await req.json()
+    
+        if(oldpassword.lenght === 0 && newpassword.lenght === 0){
+            return new ApiError(400,"Invalid Password, -Password field is required ")
+        }
+    
+        const userId = req?.user?._id // getting it from the middleware
+        
+        if(!userId){
+            return new ApiError(400,"User -Logged Out")
+        }
+    
+        const existedUser = await User.findById(userId)
+    
+        const isPasswordCorrect = await bcrypt.compare(oldpassword,existedUser?.password)
+    
+        if(isPasswordCorrect){
+            return new ApiError(400,"Password Incorrect , - you cannot change the password")
+        }
+    
+        const Updated_Password = await User.updateOne({
+            password : newpassword
+        })
+    
+        if(!Updated_Password){
+            return new ApiError(500,"Password Updation Failed")
+        }
+    
+        return res.status(201).json(
+            new Apiresponse(
+                201,
+                "Password -Updated",
+                Updated_Password
+            )
+        )
+    } catch (error) {
+        return new ApiError(
+            500,
+            "Password -Updation Failed",
+            error
+        )
+    }
+
+}
+
+const Userdetails = async(req,res) => {
+    try {
+        const userId = await req?.user?._id
+    
+        if(!userId){
+            return new ApiError(400,"User need to be login for this request")
+        }
+    
+        const existedUser = await User.findById(userId).select(" -password ")
+    
+        return res.status(200).json(
+            new Apiresponse(
+                200,
+                "User Details -founded",
+                existedUser
+            )
+        )
+    } catch (error) {
+        return new ApiError(
+            500,
+            "Failed - Not founded User detail",
+            error
+        )
+    }
+
+}
+
 
 export { 
     RegisterUser,
-    LoginUser
+    LoginUser,
+    updateusername,
+    updateemail,
+    updatepassword,
+    Userdetails
 }

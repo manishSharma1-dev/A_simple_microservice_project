@@ -5,7 +5,8 @@ const connectDB = async() => {
     try {
 
         const DBURI = process.env.DBURI
-        const connectionResponse = await mongoose.connect(DBURI)
+        const DB_COLLECTION_NAME = process.env.COLLECTION_NAME
+        const connectionResponse = await mongoose.connect(`${DBURI}/${DB_COLLECTION_NAME}`)
             .then(() => {
 
                 console.log(`DB connection Succeded, Response - ${connectionResponse}`)
