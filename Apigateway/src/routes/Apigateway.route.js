@@ -1,22 +1,18 @@
 import { Router } from "express";
-import { HelpRegister,HelpLogin } from "../controllers/routing.controller";
+import { HelpRegister,HelpLogin,HelpUpdateUsername,HelpGetUserDetail,HelpEmail,HelpUpdatePassword } from "../controllers/routing.controller";
 
 const router = Router()
 
 router.post("/register", HelpRegister )
 router.post("/login", HelpLogin)
+router.put("/updateusername",HelpUpdateUsername)
+router.put("/updatepassword",HelpUpdatePassword)
+router.put("/updateemail",HelpEmail)
+router.get("/getuserdetail",HelpGetUserDetail)
 
 
 export {
     router
 }
- 
-
-// router.route('/api/registerUser').post(RegisterUser)
-// router.route('/api/loginuser').post(LoginUser)
-// router.route('/api/updateusername').put(Authoptions,updateusername)
-// router.route('/api/updateemail').put(Authoptions,updateemail)
-// router.route('/api/updatepassword').put(Authoptions,updatepassword)
-// router.route('/api/userdetail').put(Authoptions,Userdetails)
 
  
