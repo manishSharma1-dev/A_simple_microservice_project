@@ -10,7 +10,7 @@ import (
 )
 
 type UrlshortenDB struct {
-	Id           int    `json:"id"`
+	Id           string `json:"id"`
 	UrlGiven     string `json:"urlgiven"`
 	UrlGenerated string `json:"urlgenerated"`
 }
@@ -23,7 +23,7 @@ var UrlDB []*UrlshortenDB
 
 // generating random string
 func GenerateRandomString(num int, r *rand.Rand) string {
-	var letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!£$%^&*()@"
+	var letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 	b := make([]byte, num) // creating a slice b with size num
 
@@ -47,9 +47,9 @@ func ShortenUrl(c *gin.Context) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	RandomString := GenerateRandomString(7, r)
 
-	newurl := "http://localhost:8000/" + RandomString
+	newurl := "http://localhost:4000/" + RandomString
 
-	var id int = 2
+	id := RandomString
 
 	UrlDB = append(UrlDB,
 		&UrlshortenDB{Id: id, UrlGiven: url.Url, UrlGenerated: newurl},
@@ -59,11 +59,41 @@ func ShortenUrl(c *gin.Context) {
 
 }
 
+func getallUrls(c *gin.Context) {
+	fmt.Println("Getting all the urls")
+
+	c.JSON(http.StatusOK, UrlDB)
+}
+
+func RedirecttoOriginalUrl(c *gin.Context) {
+	ID := c.Param("id")
+	fmt.Println("Received ID:", ID)
+
+	for _, index := range UrlDB {
+		fmt.Println("Checking ID:", index.Id)
+		if ID == index.Id {
+			c.Redirect(http.StatusFound, index.UrlGiven)
+			return
+		}
+	}
+
+	c.JSON(http.StatusFound, gin.H{"message": "Invalid Id"})
+
+}
+
+func homepage(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "hello from go server"})
+}
+
 func main() {
 	fmt.Println("Creating a Url-Shortner-Serivce")
 
 	router := gin.Default()
 
+	router.GET("/", homepage)
 	router.POST("/shorten-url", ShortenUrl)
+	router.GET("/getallurl", getallUrls)
+	router.GET("/:id", RedirecttoOriginalUrl)
+
 	router.Run("localhost:4000")
 }
