@@ -45,7 +45,9 @@ const RegisterUser = async (req,res) => {
                 password : hashedPassword
             }
         )
-    
+
+        await newUser.save({ validateBeforeSave : true })
+     
         const checkifUserCreatedorNot = await User.findById(newUser._id).select(" -password ")
     
         if(!checkifUserCreatedorNot){
