@@ -4,23 +4,19 @@ import { ApiError } from "../utils/ApiError.js";
 const connectDB = async() => {
     try {
 
-        const DBURI = process.env.DBURI
-        const DB_COLLECTION_NAME = process.env.COLLECTION_NAME
-        const connectionResponse = await mongoose.connect(`${DBURI}/${DB_COLLECTION_NAME}`)
-            .then(() => {
+        const DBURI = process.env.MONGO_URI
 
-                console.log(`DB connection Succeded, Response - ${connectionResponse}`)
+        const connectionResponse = await mongoose.connect(`${DBURI}/urlshortnerAuthService`)
 
-            }).catch((error) => {
+        if(!connectionResponse){
+            return new ApiError(
+                500,
+                "DB connection failed , No - Response received",
+            )
+        }
 
-                return new ApiError(
-                    500,
-                    "DB connection failed , No Response received - ",
-                    error
-                )
+        console.log(`Database connection Succeded`)
 
-            })
-        
     } catch (error) {
         return new ApiError(
             500,

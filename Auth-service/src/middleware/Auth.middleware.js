@@ -2,11 +2,17 @@ import { ApiError } from "../utils/ApiError.js"
 import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js"
 
-const Authoptions = async(res,req,next) => {
-    const token = await req.cookie?.accesstoken || req.header("Authorization").replace("Bearer ")
+const Authoptions = async(req,res,next) => {
+
+    const token = await req.cookies?.accesstoken || req.header('Authorization').replace("Bearer ","")
 
     if(!token){
-        return new ApiError(400,"User need to logout")
+        return res.status(400).json(
+            new ApiError(
+                400,
+                "User need to logout"
+            )
+        );
     }
 
     const verifiedToken = await jwt.verify(
@@ -15,16 +21,26 @@ const Authoptions = async(res,req,next) => {
     )
 
     if(!verifiedToken){
-        return new ApiError(400,"Invalid Token - can't Verify")
+        return res.status(400).json(
+            new ApiError(
+                400,
+                "Invalid Token - can't Verify"
+            )
+        );
     }
 
     const user = await User.findById(verifiedToken?._id).select(" -password ")
 
     if(!user){
-        return new ApiError(500,"token invalid no User find")
+        return res.status(500).json(
+            new ApiError(
+                500,
+                "token invalid no User find"
+            )
+        );
     }
 
-    const result = user?._conditions
+    const result = user?._id
 
     req.user = result
 
