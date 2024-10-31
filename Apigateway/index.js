@@ -1,10 +1,11 @@
 import express from "express";
 import { config } from "dotenv"
 import { router } from "./src/routes/Apigateway.route.js"
+import cookieParser from "cookie-parser";
 // import cors from "cors"
 
 const app = express()
-config("./.env.local")
+config("./.env")
 
 // const corsOptions = {
 //     origin : "",
@@ -15,6 +16,7 @@ config("./.env.local")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended : true }))
+app.use(cookieParser())
 // app.use(cors(corsOptions))
 
 app.use('/',router)

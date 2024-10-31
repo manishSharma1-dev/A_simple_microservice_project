@@ -17,11 +17,7 @@ async function GenerateRandomString(length){
 const ShortenUrl = async(req,res) => {
     try {
 
-        console.log("test 1")
-
         const { url } = await req.body
-
-        console.log("url received ",url)
 
         if(!url){
             return res.status(400).json(
@@ -32,15 +28,11 @@ const ShortenUrl = async(req,res) => {
             )
         }
     
-        console.log("test 2")
-
         let RandomString = await GenerateRandomString(7)
 
         const PORT = process.env.PORT ?? 7000
     
         const newurl = `http://localhost:${PORT}/` + RandomString
-
-        console.log("test 3")
 
         const date = new Date();
 
@@ -50,8 +42,6 @@ const ShortenUrl = async(req,res) => {
             month: '2-digit',
             day: '2-digit'  
         });
-
-        console.log(formattedDate)
     
         const NewlyaddedUrlInfotoDb = await URL.create({
             ID : RandomString,
@@ -60,20 +50,14 @@ const ShortenUrl = async(req,res) => {
             TotalNoofClicks : 0,
             Createdat : formattedDate
         })
-
-        console.log("test 4")
     
         const newAddedUrlexist = await URL.findById(NewlyaddedUrlInfotoDb?._id)
-
-        console.log("test 5")
     
         if(!newAddedUrlexist){
             return res.status(404).json(
                 new ApiError(500,"Failed to Add new Url to the Db")
             )
         }
-
-        console.log("test 6")
     
         return res.status(200).json(
             new Apiresponse(
@@ -96,7 +80,12 @@ const ShortenUrl = async(req,res) => {
 
 const Getallurls = async(req,res) => {
     try {
+
+        console.log("test 1")
+
         const allUrl = await URL.find({ })
+
+        console.log("test 2")
     
         if(!allUrl){
             return res.status(400).json(
@@ -106,12 +95,16 @@ const Getallurls = async(req,res) => {
                 )
             )
         }
+
+        console.log("test 3")
     
         if(allUrl.length === 0){
             return res.status(404).json(
                 new ApiError(404,"No Url to show")
             )
         }
+
+        console.log("test 4")
     
         return res.status(200).json(
             new Apiresponse(
@@ -120,7 +113,6 @@ const Getallurls = async(req,res) => {
                 allUrl
             )
         )
-
     } catch (error) {
         return res.status(500).json(
             new ApiError(
@@ -136,20 +128,30 @@ const RedirectToOriginalUrl = async(req,res) => {
 
     try {
 
-        const { id } = await req.params
-    
+        const { id } = req.params
+
+        if(!id){
+            return res.status(400).json(
+                new ApiError(
+                    400,
+                    "Id Didn't received"
+                )
+            )
+        }
+
         const findUrl = await URL.findOne(
             {
                 ID : id
             }
         )
+
     
         if(!findUrl){
             return res.status(400).json(
                 new ApiError(400,"Invalid :ID Passed")
             )
-        }
-    
+        }   
+        
         const urltoredirect = await findUrl?.Urlgiven
     
         res.redirect(urltoredirect)

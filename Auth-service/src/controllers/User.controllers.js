@@ -1,8 +1,8 @@
+import mongoose from "mongoose"
 import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { Apiresponse } from "../utils/Apiresponse.js"
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
 
 const RegisterUser = async(req,res) => {
     
@@ -101,7 +101,14 @@ const LoginUser = async(req,res) => {
                // - return the acces token in the user session
 
     try {
+
+        console.log("test 1")
+
         const { username, email, password } = await req.body
+
+        console.log(username,email,password)
+
+        console.log("test 2")
 
         if (!email && !username) {
             return res.status(400).json(
@@ -121,6 +128,8 @@ const LoginUser = async(req,res) => {
             );
         }
 
+        console.log("test 3")
+
         if(!password){
             return res.status(400).json(
                 new ApiError(
@@ -129,6 +138,8 @@ const LoginUser = async(req,res) => {
                 )
             ) 
         }
+
+        console.log("test 4")
 
         const existedUser = await User.findOne({
             $or : [
@@ -140,6 +151,8 @@ const LoginUser = async(req,res) => {
                 }
             ]
         })
+
+        console.log("test 5")
         
 
         if(!existedUser){
@@ -150,6 +163,8 @@ const LoginUser = async(req,res) => {
                 )
             ) 
         }
+
+        console.log("test 6")
 
         const isPasswordCorrect  = await bcrypt.compare(password,existedUser?.password)
 
@@ -162,7 +177,11 @@ const LoginUser = async(req,res) => {
             ) 
         }
 
+        console.log("test 7")
+
         const logedinUser = await User.findById(existedUser?._id).select(" -password ")
+
+
 
         // if user is already login then we wont create any token for him/her - wanted
 
@@ -192,33 +211,44 @@ const LoginUser = async(req,res) => {
         //     ) 
         // }
 
-        const accesstoken = await jwt.sign(
-            {
-                _id : logedinUser?._id
-            },
-            process.env.JWT_SECRET_KEY,
-            {
-                expiresIn : process.env.JWT_EXPIRE_KEY
-            }
-        )
+        // const accesstoken = await jwt.sign(
+        //     {
+        //         _id : logedinUser?._id
+        //     },
+        //     process.env.JWT_SECRET_KEY,
+        //     {
+        //         expiresIn : process.env.JWT_EXPIRE_KEY
+        //     }
+        // )
 
-        if(accesstoken.length === 0){
-            return res.status(500).json(
-                new ApiError(
-                    500,
-                    "Failed in - generating accesstoken"
-                )
-            ) 
-        }
+        // if(accesstoken.length === 0){
+        //     return res.status(500).json(
+        //         new ApiError(
+        //             500,
+        //             "Failed in - generating accesstoken"
+        //         )
+        //     ) 
+        // }
 
-        const options = {
-            httpOnly : true,
-            secure : true
-        }
+        // const options = {
+        //     httpOnly : true,
+        //     secure : true
+        // }
 
+        // return res
+        // .status(200)
+        // .cookie("accesstoken",accesstoken,options)
+        // .json(
+        //     new Apiresponse(
+        //         200,
+        //         "User Logged in - Successfully",
+        //         logedinUser
+        //     )
+        // )
+
+        
         return res
         .status(200)
-        .cookie("accesstoken",accesstoken,options)
         .json(
             new Apiresponse(
                 200,
@@ -244,10 +274,8 @@ const updateusername = async(req,res) => {
 
     try {
 
-        const { username } = await req.body
+        const { username,logedinUserid } = await req.body
 
-        console.log("username received",username)
-    
         if(username.length === 0 ){
             return res.status(400).json(
                 new ApiError(
@@ -257,7 +285,7 @@ const updateusername = async(req,res) => {
             );
         }
     
-        const userId = req?.user?._id // getting it from the middleware
+        const userId = logedinUserid// getting it from the middleware
     
         if(!userId){
             return res.status(400).json(
@@ -306,7 +334,7 @@ const updateusername = async(req,res) => {
 const updateemail = async(req,res) => {
     try {
 
-        const { email } = await req.body
+        const { email,logedinUserid } = await req.body
     
         if(!email){
             return res.status(400).json(
@@ -317,7 +345,7 @@ const updateemail = async(req,res) => {
             );
         }
     
-        const userId = req?.user?._id // getting it from the middleware
+        const userId = logedinUserid // getting it from the middleware
     
         if(!userId){
             return res.status(400).json(
@@ -369,7 +397,7 @@ const updateemail = async(req,res) => {
 const updatepassword = async(req,res) => {
 
     try {
-        const { oldpassword , newpassword } = await req.body
+        const { oldpassword , newpassword , logedinUserid } = await req.body
 
         if(!oldpassword && !newpassword){
             return res.status(400).json(
@@ -380,7 +408,7 @@ const updatepassword = async(req,res) => {
             );
         }
     
-        const userId = req?.user?._id // getting it from the middleware
+        const userId = logedinUserid // getting it from the middleware
         
         if(!userId){
             return res.status(400).json(
@@ -412,7 +440,6 @@ const updatepassword = async(req,res) => {
             new Apiresponse(
                 201,
                 "Password -Updated",
-                Updated_Password
             )
         )
 
@@ -429,15 +456,16 @@ const updatepassword = async(req,res) => {
 
 const Userdetails = async(req,res) => {
     try {
-        const userId = await req?.user?._id
-    
-        if(!userId){
+
+        const { id } = req.params
+            
+        if(!id){
             return res.status(400).json(
                 new ApiError(400,"User need to be login for this request")
             )
         }
     
-        const existedUser = await User.findById(userId).select(" -password ")
+        const existedUser = await User.findById(id).select(" -password")
 
         if(!existedUser){
             return res.status(400).json(
@@ -452,6 +480,7 @@ const Userdetails = async(req,res) => {
                 existedUser
             )
         )
+        
     } catch (error) {
         return res.status(500).json(
             new ApiError(

@@ -2,7 +2,7 @@ import express from "express";
 import { configDotenv } from "dotenv"
 import { connectDB } from "./src/connections/Dbconnection.js"
 import { ApiError } from "./src/utils/ApiError.js";
-import cookieParser from "cookie-parser";
+// import cookieParser from "cookie-parser";
 import cors from "cors"
 import { router } from "./src/routes/User.route.js"
 
@@ -20,7 +20,7 @@ const corsOptions = {
 
 app.use(express.urlencoded({ extended : true }))
 app.use(express.json())
-app.use(cookieParser())
+// app.use(cookieParser())
 app.use(cors(corsOptions))
 
 app.use('/',router)
