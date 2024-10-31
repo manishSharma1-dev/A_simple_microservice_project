@@ -6,7 +6,7 @@ class Apiresponse {
     ) {
         this.status = status,
         this.message = message,
-        this.data = data ?? "Data not passing"
+        this.data = data ?? ""
     }
 }
 

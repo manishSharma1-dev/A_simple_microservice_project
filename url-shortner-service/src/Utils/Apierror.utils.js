@@ -2,13 +2,14 @@ class ApiError extends Error {
     constructor(
         status,
         message,
-        data ,
-        error
+        error,
+        data 
     ){ 
+        super()
         this.status = status
         this.message = message
-        this.data = data ? data : "No data Passed here"
-        this.error = error ? error : "No Error Passed here"
+        this.data = data ?? data
+        this.error = error ?? error
     }
 }
 

@@ -258,8 +258,6 @@ const updateusername = async(req,res) => {
         }
     
         const userId = req?.user?._id // getting it from the middleware
-
-        console.log("usaer id ",userId)
     
         if(!userId){
             return res.status(400).json(
@@ -274,10 +272,9 @@ const updateusername = async(req,res) => {
             userId,
             {
                 username : username
-            }
+            },
+            { new : true }
         ).select(" -password ")
-
-        console.log("updated username",updateusername)
     
         if(!Updated_Username){
             return res.status(500).json(
@@ -292,7 +289,7 @@ const updateusername = async(req,res) => {
             new Apiresponse(
                 201,
                 "Username -Updated",
-                Updated_Username
+                Updated_Username.username
             )
         )
     } catch (error) {
@@ -306,15 +303,10 @@ const updateusername = async(req,res) => {
     }
 }
 
-
 const updateemail = async(req,res) => {
     try {
 
-        console.log("test passed 1")
-
         const { email } = await req.body
-
-        console.log("Email",email)
     
         if(!email){
             return res.status(400).json(
@@ -326,10 +318,6 @@ const updateemail = async(req,res) => {
         }
     
         const userId = req?.user?._id // getting it from the middleware
-
-        console.log("User id in email",userId)
-
-        console.log("test passed 2")
     
         if(!userId){
             return res.status(400).json(
@@ -344,12 +332,11 @@ const updateemail = async(req,res) => {
             userId,
             {
                 email : email
+            },
+            {
+                new : true
             }
         ).select(" -password ")
-
-        console.log("test passed 3")
-
-        console.log("Updated Email",Updated_Email)
     
         if(!Updated_Email){
             return res.status(500).json(
@@ -364,7 +351,7 @@ const updateemail = async(req,res) => {
             new Apiresponse(
                 201,
                 "Email -Updated",
-                Updated_Email
+                Updated_Email?.email
             )
         )
     } catch (error) {
@@ -382,24 +369,33 @@ const updateemail = async(req,res) => {
 const updatepassword = async(req,res) => {
 
     try {
-        const { oldpassword , newpassword } = await req.json()
-    
-        if(oldpassword.lenght === 0 && newpassword.lenght === 0){
-            return new ApiError(400,"Invalid Password, -Password field is required ")
+        const { oldpassword , newpassword } = await req.body
+
+        if(!oldpassword && !newpassword){
+            return res.status(400).json(
+                new ApiError(
+                    400,
+                    "Invalid Password, -Password field is required "
+                )
+            );
         }
     
         const userId = req?.user?._id // getting it from the middleware
         
         if(!userId){
-            return new ApiError(400,"User -Logged Out")
+            return res.status(400).json(
+                new ApiError(400,"User -Logged Out")
+            )
         }
     
         const existedUser = await User.findById(userId)
     
         const isPasswordCorrect = await bcrypt.compare(oldpassword,existedUser?.password)
     
-        if(isPasswordCorrect){
-            return new ApiError(400,"Password Incorrect , - you cannot change the password")
+        if(!isPasswordCorrect){
+            return res.status(405).json(
+                new ApiError(405,"Password Incorrect , - you cannot change the password")
+            )
         }
     
         const Updated_Password = await User.updateOne({
@@ -407,7 +403,9 @@ const updatepassword = async(req,res) => {
         })
     
         if(!Updated_Password){
-            return new ApiError(500,"Password Updation Failed")
+            return res.status(400).json(
+                new ApiError(400,"Password Updation Failed")
+            )
         }
     
         return res.status(201).json(
@@ -417,14 +415,16 @@ const updatepassword = async(req,res) => {
                 Updated_Password
             )
         )
+
     } catch (error) {
-        return new ApiError(
-            500,
-            "Password -Updation Failed",
-            error
+        return res.status(500).json(
+            new ApiError(
+                500,
+                "Password -Updation Failed",
+                error?.message
+            )
         )
     }
-
 }
 
 const Userdetails = async(req,res) => {
@@ -432,10 +432,18 @@ const Userdetails = async(req,res) => {
         const userId = await req?.user?._id
     
         if(!userId){
-            return new ApiError(400,"User need to be login for this request")
+            return res.status(400).json(
+                new ApiError(400,"User need to be login for this request")
+            )
         }
     
         const existedUser = await User.findById(userId).select(" -password ")
+
+        if(!existedUser){
+            return res.status(400).json(
+                new ApiError(400,"Invalid Id - No User found")
+            )
+        }
     
         return res.status(200).json(
             new Apiresponse(
@@ -445,10 +453,12 @@ const Userdetails = async(req,res) => {
             )
         )
     } catch (error) {
-        return new ApiError(
-            500,
-            "Failed - Not founded User detail",
-            error
+        return res.status(500).json(
+            new ApiError(
+                500,
+                "Failed - Not founded User detail",
+                error?.message
+            )
         )
     }
 

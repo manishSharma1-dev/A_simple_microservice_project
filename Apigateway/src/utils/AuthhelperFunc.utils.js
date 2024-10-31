@@ -1,6 +1,8 @@
 import { ApiError } from "../utils/Apierror.utils.js"
 import { Apiresponse } from "../utils/Apiresponse.utils.js"
 
+//--------------- THIS IS JUST A HELPER FUNC BUT DID'T USE IT --------------
+
 //  + points to remember 
 //  -> pathstring  :- it refers to the api string after /api like registerUser,loginuser,updateusername etc
 //  -> reponseMessage :- it refers to the message that we will pass to the frontend

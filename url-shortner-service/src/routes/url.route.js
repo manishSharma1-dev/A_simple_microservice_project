@@ -3,9 +3,10 @@ import { Getallurls, RedirectToOriginalUrl, ShortenUrl } from "../controllers/ur
 
 const router = Router()
 
-router.route('/getallurl').get(Getallurls)
+router.route('/url/getallurl').get(Getallurls)
 router.route('/:id').get(RedirectToOriginalUrl)
-router.route('/shorten-url').post(ShortenUrl)
+
+router.route('/url/shorten-url').post(ShortenUrl)
 
 export {
     router

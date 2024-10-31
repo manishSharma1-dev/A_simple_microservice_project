@@ -13,7 +13,7 @@ router.route('/api/loginuser').post(LoginUser)
 router.route('/api/updateusername').put(Authoptions,updateusername)
 router.route('/api/updateemail').put(Authoptions,updateemail)
 router.route('/api/updatepassword').put(Authoptions,updatepassword)
-router.route('/api/userdetail').put(Authoptions,Userdetails)
+router.route('/api/userdetail').get(Authoptions,Userdetails)
 
 
 export {

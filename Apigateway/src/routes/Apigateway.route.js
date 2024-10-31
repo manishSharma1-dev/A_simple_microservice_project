@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { HelpRegister,HelpLogin,HelpUpdateUsername,HelpGetUserDetail,HelpEmail,HelpUpdatePassword, HelpGetallUrl, HelpRedirecttoOriginalUrl, HelpShortenUrl } from "../controllers/routing.controller";
+import { HelpRegister,HelpLogin,HelpUpdateUsername,HelpGetUserDetail,HelpEmail,HelpUpdatePassword, HelpGetallUrl, HelpRedirecttoOriginalUrl, HelpShortenUrl } from "../controllers/routing.controller.js";
 
 const router = Router()
 

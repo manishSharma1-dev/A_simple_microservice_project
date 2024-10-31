@@ -2,7 +2,6 @@ import mongoose,{ Schema } from "mongoose"
 
 const UrlSchema = new Schema(
     {
-
         ID : {
             type : String,
             required : true,
@@ -21,7 +20,7 @@ const UrlSchema = new Schema(
             required  : true
         },
         Createdat  : {
-            type : Date,
+            type : String,
             required : true
         }
 

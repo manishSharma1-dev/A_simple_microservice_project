@@ -1,24 +1,32 @@
 import { ApiError } from "../utils/Apierror.utils.js"
-import axios from "axios"
 import { Apiresponse } from "../utils/Apiresponse.utils.js"
+import axios from "axios"
 
-const AUTHSERVICEURL = process.env.AUTH_SERVICE_URL
-const SHORTENSERVICEURL = process.env.SHORTEN_SERVICE_URL
+// const AUTHSERVICEURL = process.env.AUTH_SERVICE_URL
+// const SHORTENSERVICEURL = process.env.SHORTEN_SERVICE_URL
 
 const HelpRegister = async(req,res) => {
+
     try {
 
+        const AUTHSERVICEURL = process.env.AUTH_SERVICE_URL
+        
         const response = await axios.post(`${AUTHSERVICEURL}/api/registerUser`, req.body)
 
         if(!response){
-            return new ApiError(500,"Error -Response didn't received")
+            return res.status(500).json(
+                new ApiError(
+                    500,
+                    "Error -Response didn't received"
+                )
+            )
         }
 
-        return res.status(201).json(
+        console.log("Response from the Backend")
+
+        return res.json(
             new Apiresponse(
-                201,
-                "Rgisterd User -Success",
-                response.data
+                await response?.data
             )
         )
         
@@ -39,17 +47,24 @@ const HelpLogin = async(req,res) => {
 
     try {
 
+        const AUTHSERVICEURL = process.env.AUTH_SERVICE_URL
+
         const response = await axios.post(`${AUTHSERVICEURL}/api/loginuser`, req.body)
 
         if(!response){
-            return new ApiError(500,"Error -Response didn't received")
+            return res.status(500).json(
+                new ApiError(
+                    500,
+                    "Error -Response didn't received"
+                )
+            )
         }
 
-        return res.status(201).json(
+        console.log("Response from backednd",await response?.data)
+
+        return res.json(
             new Apiresponse(
-                201,
-                "User Login -Success",
-                response.data
+                await response?.data
             )
         )
         
@@ -68,17 +83,30 @@ const HelpLogin = async(req,res) => {
 const HelpUpdateUsername = async(req,res) => {
     try {
 
+        console.log("test 1 ")
+
+        const AUTHSERVICEURL = process.env.AUTH_SERVICE_URL
+
+        console.log("Auth service Url ",AUTHSERVICEURL)
+
         const response = await axios.put(`${AUTHSERVICEURL}/api/updateusername`, req.body)
 
+        console.log("Test 2")
+
         if(!response){
-            return new ApiError(500,"Error -Response didn't received")
+            return res.status(500).json(
+                new ApiError(
+                    500,
+                    "Error -Response didn't received"
+                )
+            )
         }
 
-        return res.status(200).json(
+        console.log("Response from the Backend",await response?.data)
+
+        return res.json(
             new Apiresponse(
-                200,
-                "UserName Updated -Success",
-                response.data
+                await response?.data
             )
         )
         
@@ -100,8 +128,15 @@ const HelpEmail = async(req,res) => {
         const response = await axios.put(`${AUTHSERVICEURL}/api/updateemail`, req.body)
 
         if(!response){
-            return new ApiError(500,"Error -Response didn't received")
+            return res.status(500).json(
+                new ApiError(
+                    500,
+                    "Error -Response didn't received"
+                )
+            )
         }
+
+        console.log("Response from the Backend",await response.data)
 
         return res.status(200).json(
             new Apiresponse(
@@ -129,8 +164,15 @@ const HelpUpdatePassword = async(req,res) => {
         const response = await axios.put(`${AUTHSERVICEURL}/api/updatepassword`, req.body)
 
         if(!response){
-            return new ApiError(500,"Error -Response didn't received")
+            return res.status(500).json(
+                new ApiError(
+                    500,
+                    "Error -Response didn't received"
+                )
+            )
         }
+
+        console.log("Response from the Backend",await response.data)
 
         return res.status(200).json(
             new Apiresponse(
@@ -159,8 +201,15 @@ const HelpGetUserDetail = async(req,res) => {
         const response = await axios.get(`${AUTHSERVICEURL}/api/userdetail`)
 
         if(!response){
-            return new ApiError(500,"Error -Response didn't received")
+            return res.status(500).json(
+                new ApiError(
+                    500,
+                    "Error -Response didn't received"
+                )
+            )
         }
+
+        console.log("Response from the Backend",await response.data)
 
         return res.status(200).json(
             new Apiresponse(
@@ -189,8 +238,15 @@ const HelpGetallUrl = async(req,res) => {
      const response = axios.get(`${SHORTENSERVICEURL}/getallurl`)
  
      if(!response){
-         return new ApiError(500,"Error -Response didn't received")
-     }
+        return res.status(500).json(
+            new ApiError(
+                500,
+                "Error -Response didn't received"
+            )
+        )
+    }
+
+    console.log("Response from the Backend",await response.data)
  
      return res.status(200).json(
          new Apiresponse(
@@ -216,8 +272,15 @@ const HelpShortenUrl = async(req,res) => {
       const response = await axios.post(`${SHORTENSERVICEURL}/api/updatepassword`, req.body)
   
       if(!response){
-          return new ApiError(500,"Error -Response didn't received")
-      }
+        return res.status(500).json(
+            new ApiError(
+                500,
+                "Error -Response didn't received"
+            )
+        )
+    }
+
+    console.log("Response from the Backend",await response.data)
   
       return res.status(200).json(
           new Apiresponse(
